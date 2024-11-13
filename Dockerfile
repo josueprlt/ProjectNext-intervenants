@@ -2,21 +2,13 @@
 FROM node:18
 
 # Créer un répertoire de travail
-WORKDIR /my-app
-
-# Copier les fichiers package.json et package-lock.json
-# COPY package.json package-lock.json ./
-
-
+WORKDIR /ProjectNext-intervenants
 
 # Copier le reste des fichiers de l'application
 COPY . .
 
 # Installer les dépendances
 RUN npm install
-
-RUN chmod +x node_modules/.bin/next
-
 
 # Exposer le port sur lequel Next.js va écouter
 EXPOSE 3000
