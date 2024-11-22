@@ -1,6 +1,6 @@
 export async function fetchIntervenants() {
   try {
-    const response = await fetch('');
+    const response = await fetch('SELECT (firstname, name) FROM interventants;');
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
