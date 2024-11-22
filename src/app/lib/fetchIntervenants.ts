@@ -1,13 +1,14 @@
-export async function fetchIntervenants() {
+import { db } from "@/app/lib/db";
+import { Intervenant } from "@/app/lib/definitions";
+
+export async function fetchIntervenants(): Promise<Intervenant[]> {
   try {
-    const response = await fetch('SELECT (firstname, name) FROM interventants;');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    throw error;
+    const client = await db.connect();
+    const result = await client.query('SELECT * FROM "intervenants"');
+    client.release();
+    return result.rows as Intervenant[];
+  } catch (e: any) {
+    console.error('Error fetching intervenants: ', e);
+    throw e;
   }
 }
