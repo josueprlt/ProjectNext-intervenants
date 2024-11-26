@@ -9,6 +9,8 @@ export default function Gestion() {
             const response = await fetch('/api/fetchIntervenants');
             const result = await response.json();
             setIntervenants(result);
+            console.log(intervenants);
+            
         };
 
         fetchData();
@@ -21,7 +23,7 @@ export default function Gestion() {
                 <>
                     <ul>
                         {intervenants.map((inter) => (
-                            <li key={inter.id}>- {inter.firstname} {inter.name}</li>
+                            <li className='flex justify-between' key={inter.id}>- {inter.firstname} {inter.name} {inter.email} {inter.key} {inter.creationdate} {inter.enddate} {inter.availability}</li>
                         ))}
                     </ul>
                 </>
