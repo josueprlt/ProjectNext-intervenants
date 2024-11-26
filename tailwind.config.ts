@@ -11,6 +11,9 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        red: "var(--color-red)",
+        redHover: "var(--color-red-hover)",
+        redLight: "var(--color-red-light)",
       },
     },
   },
