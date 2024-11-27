@@ -8,6 +8,8 @@
   --color-red: #b51822;
   --color-red-hover: #d84851;
   --color-red-light: #ffcfd2;
+  --color-orange: #d8a648;
+  --color-orange-light: #ffdd9e;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -15,11 +15,7 @@ export default function Home() {
           <p
             className="text-xl text-gray-800 md:text-3xl md:leading-normal"
           >
-            <strong>Welcome to Acme.</strong> This is the example for the{' '}
-            <a href="https://nextjs.org/learn/" className="text-red">
-              Next.js Learn Course
-            </a>
-            , brought to you by Vercel.
+            <strong>Bienvenue !</strong> Rendez vous sur le tableau de bord pour suivre les intervenants
           </p>
           <div className="flex gap-2">
             <Link
