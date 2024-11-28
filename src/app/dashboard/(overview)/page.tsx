@@ -2,8 +2,6 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react';
 import { trashIcon, penIcon, dangerIcon } from "@/app/ui/icons";
-import { log } from 'console';
-
 export default function Gestion() {
     const [intervenants, setIntervenants] = useState([]);
     const Trash = trashIcon;
@@ -43,6 +41,7 @@ export default function Gestion() {
     return (
         <main className="flex min-h-screen flex-col p-2">
             <h1 className="text-3xl font-bold mb-8 text-gray-800">Gestion des Intervenants</h1>
+            <button className='text-white bg-red'>Ajouter un intervenant</button>
             {intervenants ? (
                 <div className="bg-white shadow rounded-lg p-4">
                     <div className="grid grid-cols-7 gap-4 text-sm font-semibold text-gray-600 border-b pb-2">
