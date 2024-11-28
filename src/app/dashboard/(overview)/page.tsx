@@ -3,6 +3,15 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react';
 import { trashIcon, penIcon, dangerIcon, plusIcon } from "@/app/ui/icons";
 
+const convertDateForInput = (isoDate) => {
+    if (!isoDate) return ''; // Si la date est invalide ou vide, retourner une chaîne vide
+    const date = new Date(isoDate);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Ajouter un zéro devant si le mois est inférieur à 10
+    const day = String(date.getDate()).padStart(2, '0'); // Ajouter un zéro devant si le jour est inférieur à 10
+    return `${day}/${month}/${year}`;
+};
+
 export default function Gestion() {
     const [intervenants, setIntervenants] = useState([]);
     const Trash = trashIcon;
@@ -43,7 +52,7 @@ export default function Gestion() {
     return (
         <main className="flex min-h-screen flex-col p-2 pr-4">
             <h1 className="text-3xl font-bold mb-8 text-gray-800">Gestion des Intervenants</h1>
-            <Link href="/add/intervenant" className='flex items-center gap-2 text-white bg-red mr-auto mb-2 rounded-lg px-2 py-2 hover:bg-redHover'>
+            <Link href="/intervenant/add" className='flex items-center gap-2 text-white bg-red mr-auto mb-2 rounded-lg px-2 py-2 hover:bg-redHover'>
                 <Plus className='w-5 h-5' />
                 Ajouter un intervenant
             </Link>
@@ -62,17 +71,17 @@ export default function Gestion() {
                         {intervenants.map((inter) => (
                             <div
                                 key={inter.id}
-                                className={`relative grid grid-cols-7 gap-4 text-sm text-gray-800 py-3 items-center group rounded-md ${isDatePassed(inter.enddate) ? 'bg-orangeLight' : ''}`}
+                                className={`relative grid grid-cols-7 gap-4 text-sm text-gray-800 py-3 items-center group ${isDatePassed(inter.enddate) ? 'bg-orangeLight rounded-md' : ''}`}
                             >
                                 <div className='pl-2'>{inter.firstname}</div>
                                 <div>{inter.name}</div>
                                 <div className="truncate">{inter.email}</div>
                                 <div className="truncate">{inter.key}</div>
-                                <div className="truncate">{inter.creationdate}</div>
-                                <div className="truncate">{inter.enddate}</div>
+                                <div className="truncate">{convertDateForInput(inter.creationdate)}</div>
+                                <div className="truncate">{convertDateForInput(inter.enddate)}</div>
                                 <div>{inter.availability}</div>
                                 <div className="absolute right-0 top-1/2 transform -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                                    <Link href={`/modification/intervenant/${inter.id}`} className="bg-gray-50 p-2 rounded hover:bg-sky-100">
+                                    <Link href={`/intervenant/modification/${inter.id}`} className="bg-gray-50 p-2 rounded hover:bg-sky-100">
                                         <Pen className="w-5" />
                                     </Link>
                                     <button onClick={() => handleDelete(inter.id)} className="bg-gray-50 p-2 rounded hover:bg-redLight hover:text-red">
