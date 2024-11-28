@@ -46,6 +46,27 @@ export async function addIntervenant(data: { firstname: string; name: string; em
   }
 }
 
+export async function findUserByEmail(email: string) {
+  const client = await db.connect();
+  try {
+      const result = await client.query(
+          'SELECT * FROM intervenants WHERE email = $1',
+          [email]
+      );
+
+      if (result.rowCount === 0) {
+          return null;
+      }
+
+      return result.rows[0];
+  } catch (err) {
+      console.error('Erreur lors de la recherche de l\'email', err);
+      throw err;
+  } finally {
+      client.release();
+  }
+}
+
 export async function deleteIntervenantById(id: number) {
   const client = await db.connect();
   try {
