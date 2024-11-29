@@ -1,7 +1,8 @@
 "use client"
 import Link from 'next/link'
 import { useEffect, useState } from 'react';
-import { trashIcon, penIcon, dangerIcon, plusIcon } from "@/app/ui/icons";
+import { TrashIcon, PenIcon, DangerIcon, PlusIcon, KeyIcon } from "@/app/ui/icons";
+import { v4 as uuidv4 } from 'uuid';
 
 const convertDateForInput = (isoDate) => {
     if (!isoDate) return ''; // Si la date est invalide ou vide, retourner une chaîne vide
@@ -14,10 +15,6 @@ const convertDateForInput = (isoDate) => {
 
 export default function Gestion() {
     const [intervenants, setIntervenants] = useState([]);
-    const Trash = trashIcon;
-    const Pen = penIcon;
-    const Danger = dangerIcon;
-    const Plus = plusIcon;
 
     function isDatePassed(endDate: string): boolean {
         const currentDate = new Date();
@@ -38,6 +35,38 @@ export default function Gestion() {
             console.error("Erreur lors de la suppression de l'intervenant", error);
         }
     };
+    
+    const handleRegenerate = async (id: number) => {
+        try {
+            const response = await fetch(`/api/regenerateKeyIntervenant/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                fetchData();
+            }
+        } catch (error) {
+            console.error("Erreur lors de la regénération de la clé de l'intervenant", error);
+        }
+    };
+
+    const handleRegenerateAll = async () => {
+        try {
+            const response = await fetch(`/api/regenerateAllKeyIntervenant`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                fetchData();
+            }
+        } catch (error) {
+            console.error("Erreur lors de la regénération de la clé des intervenants", error);
+        }
+    };
 
     const fetchData = async () => {
         const response = await fetch('/api/fetchIntervenants');
@@ -53,7 +82,7 @@ export default function Gestion() {
         <main className="flex min-h-screen flex-col p-2 pr-4">
             <h1 className="text-3xl font-bold mb-8 text-gray-800">Gestion des Intervenants</h1>
             <Link href="/intervenant/add" className='flex items-center gap-2 text-white bg-red mr-auto mb-2 rounded-lg px-2 py-2 hover:bg-redHover'>
-                <Plus className='w-5 h-5' />
+                <PlusIcon className='w-5 h-5' />
                 Ajouter un intervenant
             </Link>
             {intervenants ? (
@@ -82,15 +111,18 @@ export default function Gestion() {
                                 <div>{inter.availability}</div>
                                 <div className="absolute right-0 top-1/2 transform -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
                                     <Link href={`/intervenant/modification/${inter.id}`} className="bg-gray-50 p-2 rounded hover:bg-sky-100">
-                                        <Pen className="w-5" />
+                                        <PenIcon className="w-4 h-4" />
                                     </Link>
+                                    <button onClick={() => handleRegenerate(inter.id)} className="bg-gray-50 p-2 rounded hover:bg-sky-100">
+                                        <KeyIcon className="w-4 h-4" />
+                                    </button>
                                     <button onClick={() => handleDelete(inter.id)} className="bg-gray-50 p-2 rounded hover:bg-redLight hover:text-red">
-                                        <Trash className="w-5" />
+                                        <TrashIcon className="w-4 h-4" />
                                     </button>
                                 </div>
                                 {isDatePassed(inter.enddate) && (
                                     <div className='absolute right-5 top-1/2 transform -translate-y-1/2 flex gap-1 z-0'>
-                                        <Danger className="w-6 h-6 text-orange" />
+                                        <DangerIcon className="w-6 h-6 text-orange" />
                                     </div>
                                 )}
                             </div>
@@ -100,6 +132,10 @@ export default function Gestion() {
             ) : (
                 <p className="text-gray-500">Chargement...</p>
             )}
+            <button onClick={() => handleRegenerateAll()} className='flex gap-2 rounded-md bg-gray-50 mr-auto mt-2 p-3 text-sm font-medium hover:bg-sky-100 hover:text-red'>
+                <KeyIcon className='w-5 h-5' />
+                Regénérer les clés
+            </button>
         </main>
     );
 }

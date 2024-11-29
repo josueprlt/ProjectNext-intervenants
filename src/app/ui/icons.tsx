@@ -1,7 +1,7 @@
 import React from "react";
 import { SVGAttributes } from "react";
 
-function gestionIcon(props: SVGAttributes<SVGElement>) {
+function GestionIcon(props: SVGAttributes<SVGElement>) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -17,7 +17,7 @@ function gestionIcon(props: SVGAttributes<SVGElement>) {
     );
 }
 
-function disponibilityIcon(props: SVGAttributes<SVGElement>) {
+function DisponibilityIcon(props: SVGAttributes<SVGElement>) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -33,7 +33,7 @@ function disponibilityIcon(props: SVGAttributes<SVGElement>) {
     );
 }
 
-function signOutIcon(props: SVGAttributes<SVGElement>) {
+function SignOutIcon(props: SVGAttributes<SVGElement>) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -49,7 +49,7 @@ function signOutIcon(props: SVGAttributes<SVGElement>) {
     );
 }
 
-function penIcon(props: SVGAttributes<SVGElement>) {
+function PenIcon(props: SVGAttributes<SVGElement>) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -64,7 +64,7 @@ function penIcon(props: SVGAttributes<SVGElement>) {
         </svg>
     );
 }
-function trashIcon(props: SVGAttributes<SVGElement>) {
+function TrashIcon(props: SVGAttributes<SVGElement>) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +80,7 @@ function trashIcon(props: SVGAttributes<SVGElement>) {
     );
 }
 
-function dangerIcon(props: SVGAttributes<SVGElement>) {
+function DangerIcon(props: SVGAttributes<SVGElement>) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -96,7 +96,7 @@ function dangerIcon(props: SVGAttributes<SVGElement>) {
     );
 }
 
-function plusIcon(props: SVGAttributes<SVGElement>) {
+function PlusIcon(props: SVGAttributes<SVGElement>) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -112,7 +112,7 @@ function plusIcon(props: SVGAttributes<SVGElement>) {
     );
 }
 
-function closeIcon(props: SVGAttributes<SVGElement>) {
+function CloseIcon(props: SVGAttributes<SVGElement>) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -128,4 +128,20 @@ function closeIcon(props: SVGAttributes<SVGElement>) {
     );
 }
 
-export { gestionIcon, disponibilityIcon, signOutIcon, penIcon, trashIcon, dangerIcon, plusIcon, closeIcon };
+function KeyIcon(props: SVGAttributes<SVGElement>) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            className="bi bi-key-fill"
+            viewBox="0 0 16 16"
+            {...props}
+        >
+            <path d="M3.5 11.5a3.5 3.5 0 1 1 3.163-5H14L15.5 8 14 9.5l-1-1-1 1-1-1-1 1-1-1-1 1H6.663a3.5 3.5 0 0 1-3.163 2M2.5 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
+        </svg>
+    );
+}
+
+export { GestionIcon, DisponibilityIcon, SignOutIcon, PenIcon, TrashIcon, DangerIcon, PlusIcon, CloseIcon, KeyIcon };

@@ -1,4 +1,5 @@
 import db from './db';
+import { v4 as uuidv4 } from 'uuid';
 
 // Fonction pour récupérer les intervenants
 export async function getIntervenants() {
@@ -106,6 +107,75 @@ export async function updateIntervenantById(id: number, data: { firstname: strin
         return result.rows[0]; // Retourne l'intervenant mis à jour
     } catch (err) {
         console.error('Erreur lors de la mise à jour de l’intervenant:', err);
+        throw err;
+    } finally {
+        client.release();
+    }
+}
+
+export async function regenerateKeyIntervenantById(id: number, data: { key: string }) {
+    const client = await db.connect();
+    try {
+        const query = `UPDATE intervenants SET key = $1 WHERE id = $2 RETURNING *;`;
+
+        const values = [
+            data.key,
+            id,
+        ];
+
+        const result = await client.query(query, values);
+
+        if (result.rowCount === 0) {
+            console.error(`Aucun intervenant trouvé avec l'ID ${id}`);
+            throw new Error('Intervenant non trouvé');
+        }
+
+        console.log(`Clé régénérée avec succès pour l'intervenant ID ${id}`);
+        return result.rows[0]; // Retourne l'intervenant mis à jour
+    } catch (err) {
+        console.error('Erreur lors de la mise à jour de l’intervenant:', err);
+        throw err;
+    } finally {
+        client.release();
+    }
+}
+
+export async function regenerateAllKeysIntervenants() {
+    const client = await db.connect();
+    try {
+        // Récupérer tous les intervenants
+        const querySelect = `SELECT id FROM intervenants;`;
+        const result = await client.query(querySelect);
+
+        if (result.rowCount === 0) {
+            console.error('Aucun intervenant trouvé.');
+            throw new Error('Pas d\'intervenants dans la base de données');
+        }
+
+        const intervenants = result.rows;
+
+        // Mise à jour des clés
+        const updates = intervenants.map(async (intervenant) => {
+            const newKey = uuidv4(); // Générer une nouvelle clé unique
+            const queryUpdate = `UPDATE intervenants SET key = $1 WHERE id = $2 RETURNING *;`;
+            const values = [newKey, intervenant.id];
+            const updateResult = await client.query(queryUpdate, values);
+
+            if (updateResult.rowCount === 0) {
+                console.error(`Impossible de mettre à jour l'intervenant avec l'ID ${intervenant.id}`);
+            } else {
+                console.log(`Clé régénérée avec succès pour l'intervenant ID ${intervenant.id}`);
+            }
+            return updateResult.rows[0]; // Retourne l'intervenant mis à jour
+        });
+
+        // Attendre que toutes les mises à jour soient terminées
+        await Promise.all(updates);
+
+        console.log('Toutes les clés ont été régénérées avec succès.');
+        return { success: true };
+    } catch (err) {
+        console.error('Erreur lors de la régénération des clés des intervenants:', err);
         throw err;
     } finally {
         client.release();

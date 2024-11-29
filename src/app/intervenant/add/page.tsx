@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { closeIcon } from "@/app/ui/icons";
+import { CloseIcon } from "@/app/ui/icons";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -16,7 +16,6 @@ export default function AddIntervenant() {
     const [key, setKey] = useState(uuidv4());
     const [availability, setAvailability] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const Close = closeIcon;
 
     const handleAdd = async () => {
         const data = {
@@ -68,7 +67,7 @@ export default function AddIntervenant() {
                     className="max-w-xl p-6 m-auto bg-white rounded-lg shadow-md space-y-6 relative"
                 >
                     <Link href="/dashboard" className='text-red hover:text-redHover'>
-                        <Close className='absolute right-5 top-5 w-8 h-8' />
+                        <CloseIcon className='absolute right-5 top-5 w-8 h-8' />
                     </Link>
                     <h2 className='text-center mb-5 text-2xl font-bold'>Ajouter un intervenant</h2>
                     <div className="flex flex-col space-y-2">

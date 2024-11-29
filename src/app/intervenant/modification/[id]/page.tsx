@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { closeIcon } from "@/app/ui/icons";
+import { CloseIcon } from "@/app/ui/icons";
 
 const convertDateForInput = (isoDate) => {
     if (!isoDate) return ''; // Si la date est invalide ou vide, retourner une chaîne vide
@@ -26,7 +26,6 @@ export default function modificationIntervenant() {
     const [errorMessage, setErrorMessage] = useState("");
     const params = useParams();
     const id = params.id;
-    const Close = closeIcon;
 
     const fetchData = async () => {
         const response = await fetch(`/api/fetchIntervenant/${id}`);
@@ -93,7 +92,7 @@ export default function modificationIntervenant() {
                             className="max-w-xl p-6 m-auto bg-white rounded-lg shadow-md space-y-6 relative"
                         >
                             <Link href="/dashboard" className='text-red hover:text-redHover'>
-                                <Close className='absolute right-5 top-5 w-8 h-8' />
+                                <CloseIcon className='absolute right-5 top-5 w-8 h-8' />
                             </Link>
                             <h2 className='text-center mb-5 text-2xl font-bold'>Modifier un intervenant</h2>
                             <div className="flex flex-col space-y-2">

@@ -1,6 +1,6 @@
 "use client";
 
-import { gestionIcon, disponibilityIcon } from "@/app/ui/icons";
+import { GestionIcon, DisponibilityIcon } from "@/app/ui/icons";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
@@ -12,12 +12,12 @@ const links = [
   {
     name: 'Gestion',
     href: '/dashboard',
-    icon: gestionIcon,
+    icon: GestionIcon,
   },
   {
     name: 'Disponibilités',
     href: '/dashboard/disponibility',
-    icon: disponibilityIcon,
+    icon: DisponibilityIcon,
   },
 ];
 
