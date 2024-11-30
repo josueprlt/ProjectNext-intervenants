@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from "next/image";
 import NavLinks from "./nav-links";
 import { SignOutIcon } from "@/app/ui/icons";
+import { signOut } from 'next-auth';
 
 export default function SideNav() {
 
@@ -23,7 +24,12 @@ export default function SideNav() {
                         alt="Screenshots of the dashboard project showing desktop version"
                     />
                 </div>
-                <form>
+                <form
+                    action={async () => {
+                        'use server';
+                        await signOut();
+                    }}
+                >
                     <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-redLight hover:text-redHover md:flex-none md:justify-start md:p-2 md:px-3">
                         <SignOutIcon className="w-6" />
                         <div className="hidden md:block">Se Déconnecter</div>
