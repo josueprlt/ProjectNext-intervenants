@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { CloseIcon } from "@/app/ui/icons";
+import Loading from "./loading";
 
 const convertDateForInput = (isoDate) => {
     if (!isoDate) return ''; // Si la date est invalide ou vide, retourner une chaîne vide
@@ -24,10 +25,12 @@ export default function modificationIntervenant() {
     const [enddate, setEnddate] = useState(null);
     const [availability, setAvailability] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(true);
     const params = useParams();
     const id = params.id;
 
     const fetchData = async () => {
+        setLoading(true);
         const response = await fetch(`/api/fetchIntervenant/${id}`);
         const result = await response.json();
         setIntervenant(result);
@@ -36,6 +39,7 @@ export default function modificationIntervenant() {
         setEmail(result.email);
         setEnddate(result.enddate);
         setAvailability(result.availability);
+        setLoading(false);
     };
 
     const handleModification = async () => {
@@ -46,7 +50,7 @@ export default function modificationIntervenant() {
             enddate,
             availability,
         };
-
+        
         try {
             const response = await fetch(`/api/modificationIntervenant/${id}`, {
                 method: 'PUT',
@@ -78,6 +82,10 @@ export default function modificationIntervenant() {
             setEnddate(convertDateForInput(intervenant.enddate)); // Conversion de la date récupérée
         }
     }, [intervenant]);
+
+    if (loading) {
+        return <Loading />;
+    }
 
     return (
         <>

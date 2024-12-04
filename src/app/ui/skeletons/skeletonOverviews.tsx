@@ -2,14 +2,8 @@
 export default function SkeletonOverviews() {
 
     const duplicatedContent = Array.from({ length: 6 }, (_, index) => (
-        <div key={index} className="relative grid grid-cols-7 gap-4 text-sm text-slate-100 bg-slate-100 py-3 items-center group">
-            <div className='ml-2 text-slate-200 bg-slate-200 rounded-lg'>Animate</div>
-            <div className="text-slate-200 bg-slate-200 rounded-lg">Animate</div>
-            <div className="text-slate-200 bg-slate-200 rounded-lg">Animate</div>
-            <div className="text-slate-200 bg-slate-200 rounded-lg">Animate</div>
-            <div className="text-slate-200 bg-slate-200 rounded-lg">Animate</div>
-            <div className="text-slate-200 bg-slate-200 rounded-lg">Animate</div>
-            <div className="text-slate-200 bg-slate-200 rounded-lg mr-2">Animate</div>
+        <div key={index} className="relative w-full px-2 gap-4 text-sm text-slate-100 bg-slate-100 py-3 items-center group">
+            <div className='text-slate-200 w-full bg-slate-200 rounded-lg'>Animate</div>
         </div>
     ))
 
@@ -20,16 +14,10 @@ export default function SkeletonOverviews() {
                 Ajouter un intervenant
             </div>
             <div className="rounded-lg p-4 bg-slate-200">
-                <div className="grid grid-cols-7 gap-4 text-sm font-semibold text-gray-600 pb-2">
-                    <div className='ml-2 text-slate-100 bg-slate-100 rounded-lg'>Prénom</div>
-                    <div className="text-slate-100 bg-slate-100 rounded-lg">Nom</div>
-                    <div className="text-slate-100 bg-slate-100 rounded-lg">Email</div>
-                    <div className="text-slate-100 bg-slate-100 rounded-lg">Clé</div>
-                    <div className="text-slate-100 bg-slate-100 rounded-lg">Date de création</div>
-                    <div className="text-slate-100 bg-slate-100 rounded-lg">Date de fin</div>
-                    <div className="text-slate-100 bg-slate-100 rounded-lg mr-2">Disponibilité</div>
+                <div className="w-full px-2 text-sm font-semibold text-gray-600 pb-2">
+                    <div className='text-slate-100 w-full bg-slate-100 rounded-lg'>Prénom</div>
                 </div>
-                <div className="divide-y rounded-lg overflow-hidden">
+                <div className="divide-y rounded-lg w-full overflow-hidden">
                     {duplicatedContent}
                 </div>
             </div>
