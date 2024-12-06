@@ -1,36 +1,38 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 
 export default function LoginPage() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Empêche le rechargement de la page
+    setError(null); // Réinitialise l'erreur
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const result = await signIn('credentials', {
-      redirect: false,
-      email: formData.email,
-      password: formData.password,
-    });
+      const data = await response.json();
 
-    if (result.error) {
-      setError(result.error);
-    } else {
-      setSuccess(true);
-      window.location.href = '/dashboard'; // Redirection vers le tableau de bord ou autre page
+      if (response.ok) {
+        setSuccess(true);
+        console.log('Connexion réussie');
+        // Redirection ou autre action après le succès
+        window.location.href = '/dashboard';
+      } else {
+        setError(data.error || 'Une erreur est survenue');
+      }
+    } catch (err) {
+      setError('Erreur de connexion au serveur');
     }
   };
 
@@ -47,23 +49,23 @@ export default function LoginPage() {
               id="email"
               name="email"
               type="email"
-              value={formData.email}
-              onChange={handleChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div>
             <label htmlFor="password">Password</label>
             <input
-              id='password'
-              name='password'
-              type='password'
-              value={formData.password}
-              onChange={handleChange}
+              id="password"
+              name="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
-          {error && <p>{error}</p>}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
           <button type="submit">Log In</button>
         </form>
       )}
