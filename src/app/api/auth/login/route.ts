@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import db from '../../../lib/db';
+import { log } from 'console';
 
 export async function POST(request: Request) {
   try {
@@ -13,6 +14,9 @@ export async function POST(request: Request) {
 
     // Recherche de l'utilisateur dans la base de données
     const result = await db.query('SELECT id, email, password FROM users WHERE email = $1', [email]);
+
+    log(result);
+    
 
     if (result.rows.length === 0) {
       return NextResponse.json({ error: 'Identifiants incorrects' }, { status: 401 });
