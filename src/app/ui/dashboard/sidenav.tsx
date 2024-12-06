@@ -1,11 +1,40 @@
 "use client"
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import NavLinks from './nav-links';
 import { SignOutIcon } from '@/app/ui/icons';
 
 export default function SideNav() {
+  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const response = await fetch('/api/auth/verifyToken', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setIsLoggedIn(true);
+          setUser(data.user);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkToken();
+  }, []);
+
+
   const handleLogout = async () => {
     try {
       const response = await fetch('/api/auth/logout', {
@@ -41,7 +70,7 @@ export default function SideNav() {
         <NavLinks />
 
         {/* Section pour l'image (optionnelle sur mobile) */}
-        <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:px-8 md:flex md:items-center">
+        <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:px-5 md:flex md:flex-wrap md:items-center">
           <Image
             src="/universiteLimoges.png"
             width={700}
@@ -49,6 +78,9 @@ export default function SideNav() {
             className="hidden md:block"
             alt="Screenshots of the dashboard project showing desktop version"
           />
+          {isLoggedIn && (
+            <p>Connecté en tant que <br /> <span className='text-redHover'>{user.email}</span></p>
+          )}
         </div>
 
         {/* Bouton de déconnexion */}
