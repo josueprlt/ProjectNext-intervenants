@@ -24,7 +24,7 @@ export async function getIntervenantById(id: number) {
         }
         return result.rows[0];
     } catch (err) {
-        console.error('Erreur lors de la suppression', err);
+        console.error("Erreur lors de la récupération de l'intervant", err);
         throw err;
     } finally {
         client.release();
@@ -176,6 +176,22 @@ export async function regenerateAllKeysIntervenants() {
         return { success: true };
     } catch (err) {
         console.error('Erreur lors de la régénération des clés des intervenants:', err);
+        throw err;
+    } finally {
+        client.release();
+    }
+}
+
+export async function getIntervenantByKey(key: string) {
+    const client = await db.connect();
+    try {
+        const result = await client.query('SELECT * FROM intervenants WHERE key = $1', [key]);
+        if (result.rowCount === 0) {
+            throw new Error('Intervenant non trouvé');
+        }
+        return result.rows[0];
+    } catch (err) {
+        console.error("Erreur lors de la récupération de l'intervant", err);
         throw err;
     } finally {
         client.release();

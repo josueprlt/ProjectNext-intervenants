@@ -17,6 +17,26 @@ export default function AddIntervenant() {
     const [availability, setAvailability] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
+    useEffect(() => {
+        const verifyToken = async () => {
+            try {
+                const response = await fetch('/api/auth/verifyToken', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                if (!response.ok) {
+                    throw new Error('Token invalide');
+                }
+            } catch (error) {
+                setErrorMessage(error.message);
+                router.push('/login');
+            }
+        };
+
+        verifyToken();
+    }, [router]);
+
     const handleAdd = async () => {
         const data = {
             firstname,

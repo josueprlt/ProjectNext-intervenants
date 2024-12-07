@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { TrashIcon, PenIcon, DangerIcon, PlusIcon, KeyIcon } from "@/app/ui/icons";
+import { TrashIcon, PenIcon, DangerIcon, PlusIcon, KeyIcon, CalendarIcon } from "@/app/ui/icons";
 import Loading from "./loading";
 import { useRouter } from 'next/navigation';
 
@@ -22,10 +22,10 @@ export default function Gestion() {
   const [user, setUser] = useState(null);
   const router = useRouter();
 
-  function isDatePassed(endDate: string): boolean {
-    const currentDate = new Date();
+  function isDatePassed(creationDate:string, endDate: string): boolean {
+    const parsedCreationDate = new Date(creationDate);
     const parsedEndDate = new Date(endDate);
-    return parsedEndDate < currentDate;
+    return parsedEndDate < parsedCreationDate;
   }
 
   useEffect(() => {
@@ -128,20 +128,20 @@ export default function Gestion() {
         Ajouter un intervenant
       </Link>
       <div className="bg-white rounded-lg p-4">
-        <div className="grid grid-cols-7 gap-4 text-sm font-semibold text-gray-600 border-b pb-2">
+        <div className="grid grid-cols-6 gap-4 text-sm font-semibold text-gray-600 border-b pb-2">
           <div className='pl-2'>Prénom</div>
           <div>Nom</div>
           <div>Email</div>
           <div>Clé</div>
           <div>Date de création</div>
-          <div>Date de fin</div>
-          <div>Disponibilité</div>
+          <div>Date de validité</div>
+          {/* <div>Disponibilité</div> */}
         </div>
         <div className="divide-y">
           {intervenants.map((inter) => (
             <div
               key={inter.id}
-              className={`relative grid grid-cols-7 gap-4 text-sm text-gray-800 py-3 items-center group ${isDatePassed(inter.enddate) ? 'bg-orangeLight rounded-md' : ''}`}
+              className={`relative grid grid-cols-6 gap-4 text-sm text-gray-800 py-3 items-center group ${isDatePassed(inter.creationdate, inter.enddate) ? 'bg-orangeLight rounded-md' : ''}`}
             >
               <div className='pl-2'>{inter.firstname}</div>
               <div>{inter.name}</div>
@@ -149,8 +149,11 @@ export default function Gestion() {
               <div className="truncate">{inter.key}</div>
               <div className="truncate">{convertDateForInput(inter.creationdate)}</div>
               <div className="truncate">{convertDateForInput(inter.enddate)}</div>
-              <div>{inter.availability}</div>
+              {/* <div>{inter.availability}</div> */}
               <div className="absolute right-0 top-1/2 transform -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                <Link href={`/availability?key=${inter.key}`} className="bg-gray-50 p-2 rounded hover:bg-sky-100">
+                  <CalendarIcon className="w-4 h-4" />
+                </Link>
                 <Link href={`/intervenant/modification/${inter.id}`} className="bg-gray-50 p-2 rounded hover:bg-sky-100">
                   <PenIcon className="w-4 h-4" />
                 </Link>
@@ -161,11 +164,11 @@ export default function Gestion() {
                   <TrashIcon className="w-4 h-4" />
                 </button>
               </div>
-              {isDatePassed(inter.enddate) && (
+              {/* {isDatePassed(inter.enddate) && (
                 <div className='absolute right-5 top-1/2 transform -translate-y-1/2 flex gap-1 z-0'>
                   <DangerIcon className="w-6 h-6 text-orange" />
                 </div>
-              )}
+              )} */}
             </div>
           ))}
         </div>

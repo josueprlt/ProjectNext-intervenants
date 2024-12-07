@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { CloseIcon } from "@/app/ui/icons";
+import { CloseIcon, SpinnerIcon } from "@/app/ui/icons";
 import Loading from "./loading";
 
 const convertDateForInput = (isoDate) => {
@@ -16,18 +16,48 @@ const convertDateForInput = (isoDate) => {
     return `${year}-${month}-${day}`;
 };
 
+function isDatePassed(creationDate: string, endDate: string): boolean {
+    const parsedCreationDate = new Date(creationDate);
+    const parsedEndDate = new Date(endDate);
+    return parsedEndDate < parsedCreationDate;
+}
+
 export default function modificationIntervenant() {
     const router = useRouter();
     const [intervenant, setIntervenant] = useState(null);
     const [firstname, setFirstname] = useState("");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [creationdate, setCreationdate] = useState(null);
     const [enddate, setEnddate] = useState(null);
     const [availability, setAvailability] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(true);
     const params = useParams();
     const id = params.id;
+
+    useEffect(() => {
+        const verifyToken = async () => {
+            try {
+                const response = await fetch('/api/auth/verifyToken', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                if (!response.ok) {
+                    throw new Error('Token invalide');
+                }
+
+                fetchData();
+                setLoading(false);
+            } catch (error) {
+                setErrorMessage(error.message);
+                router.push('/login');
+            }
+        };
+
+        verifyToken();
+    }, [router]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -37,6 +67,7 @@ export default function modificationIntervenant() {
         setFirstname(result.firstname);
         setName(result.name);
         setEmail(result.email);
+        setCreationdate(result.creationdate);
         setEnddate(result.enddate);
         setAvailability(result.availability);
         setLoading(false);
@@ -50,7 +81,7 @@ export default function modificationIntervenant() {
             enddate,
             availability,
         };
-        
+
         try {
             const response = await fetch(`/api/modificationIntervenant/${id}`, {
                 method: 'PUT',
@@ -74,11 +105,8 @@ export default function modificationIntervenant() {
     };
 
     useEffect(() => {
-        fetchData();
-    }, []);
-
-    useEffect(() => {
-        if (intervenant?.enddate) {
+        if (intervenant) {
+            setCreationdate(convertDateForInput(intervenant.creationdate));
             setEnddate(convertDateForInput(intervenant.enddate)); // Conversion de la date récupérée
         }
     }, [intervenant]);
@@ -149,7 +177,7 @@ export default function modificationIntervenant() {
                                 value={enddate}
                                 onChange={(e) => setEnddate(e.target.value)}
                                 required
-                                className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red"
+                                className={`p-2 border rounded-md focus:outline-none focus:ring-2 ${isDatePassed(creationdate, enddate) ? 'bg-orangeLight focus:ring-orange border-orange' : 'focus:ring-red border-gray-300'}`}
                             />
                         </div>
 

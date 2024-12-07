@@ -8,7 +8,6 @@ function GestionIcon(props: SVGAttributes<SVGElement>) {
             width="16"
             height="16"
             fill="currentColor"
-            className="bi bi-people-fill"
             viewBox="0 0 16 16"
             {...props}
         >
@@ -24,7 +23,6 @@ function DisponibilityIcon(props: SVGAttributes<SVGElement>) {
             width="16"
             height="16"
             fill="currentColor"
-            className="bi bi-file-bar-graph-fill"
             viewBox="0 0 16 16"
             {...props}
         >
@@ -40,7 +38,6 @@ function SignOutIcon(props: SVGAttributes<SVGElement>) {
             width="16"
             height="16"
             fill="currentColor"
-            className="bi bi-door-closed-fill"
             viewBox="0 0 16 16"
             {...props}
         >
@@ -56,7 +53,6 @@ function PenIcon(props: SVGAttributes<SVGElement>) {
             width="16"
             height="16"
             fill="currentColor"
-            className="bi bi-pencil-fill"
             viewBox="0 0 16 16"
             {...props}
         >
@@ -71,7 +67,6 @@ function TrashIcon(props: SVGAttributes<SVGElement>) {
             width="16"
             height="16"
             fill="currentColor"
-            className="bi bi-trash3-fill"
             viewBox="0 0 16 16"
             {...props}
         >
@@ -87,7 +82,6 @@ function DangerIcon(props: SVGAttributes<SVGElement>) {
             width="16"
             height="16"
             fill="currentColor"
-            className="bi bi-exclamation-diamond-fill"
             viewBox="0 0 16 16"
             {...props}
         >
@@ -103,7 +97,6 @@ function PlusIcon(props: SVGAttributes<SVGElement>) {
             width="16"
             height="16"
             fill="currentColor"
-            className="bi bi-plus-square-fill"
             viewBox="0 0 16 16"
             {...props}
         >
@@ -119,7 +112,6 @@ function CloseIcon(props: SVGAttributes<SVGElement>) {
             width="16"
             height="16"
             fill="currentColor"
-            className="bi bi-x-square-fill"
             viewBox="0 0 16 16"
             {...props}
         >
@@ -135,7 +127,6 @@ function KeyIcon(props: SVGAttributes<SVGElement>) {
             width="16"
             height="16"
             fill="currentColor"
-            className="bi bi-key-fill"
             viewBox="0 0 16 16"
             {...props}
         >
@@ -144,4 +135,33 @@ function KeyIcon(props: SVGAttributes<SVGElement>) {
     );
 }
 
-export { GestionIcon, DisponibilityIcon, SignOutIcon, PenIcon, TrashIcon, DangerIcon, PlusIcon, CloseIcon, KeyIcon };
+function CalendarIcon(props: SVGAttributes<SVGElement>) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+        >
+            <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4zM16 7V5H0v5h5a1 1 0 1 1 0 2H0v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9h-6a1 1 0 1 1 0-2z" />
+        </svg>
+    );
+}
+
+function SpinnerIcon(props: SVGAttributes<SVGElement>) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+        >
+            <path d="M12 22C17.5228 22 22 17.5228 22 12H19C19 15.866 15.866 19 12 19V22Z" fill="#000000" />
+            <path d="M2 12C2 6.47715 6.47715 2 12 2V5C8.13401 5 5 8.13401 5 12H2Z" fill="#000000" />
+        </svg>
+    );
+}
+
+export { GestionIcon, DisponibilityIcon, SignOutIcon, PenIcon, TrashIcon, DangerIcon, PlusIcon, CloseIcon, KeyIcon, CalendarIcon, SpinnerIcon };
