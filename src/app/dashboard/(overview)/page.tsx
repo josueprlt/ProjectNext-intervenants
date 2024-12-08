@@ -22,10 +22,10 @@ export default function Gestion() {
   const [user, setUser] = useState(null);
   const router = useRouter();
 
-  function isDatePassed(creationDate:string, endDate: string): boolean {
-    const parsedCreationDate = new Date(creationDate);
+  function isDatePassed(endDate: string): boolean {
+    const currentDate = new Date();
     const parsedEndDate = new Date(endDate);
-    return parsedEndDate < parsedCreationDate;
+    return parsedEndDate < currentDate;
   }
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export default function Gestion() {
           {intervenants.map((inter) => (
             <div
               key={inter.id}
-              className={`relative grid grid-cols-6 gap-4 text-sm text-gray-800 py-3 items-center group ${isDatePassed(inter.creationdate, inter.enddate) ? 'bg-orangeLight rounded-md' : ''}`}
+              className={`relative grid grid-cols-6 gap-4 text-sm text-gray-800 py-3 items-center group ${isDatePassed(inter.enddate) ? 'bg-orangeLight rounded-md' : ''}`}
             >
               <div className='pl-2'>{inter.firstname}</div>
               <div>{inter.name}</div>

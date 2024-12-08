@@ -16,10 +16,10 @@ const convertDateForInput = (isoDate) => {
     return `${year}-${month}-${day}`;
 };
 
-function isDatePassed(creationDate: string, endDate: string): boolean {
-    const parsedCreationDate = new Date(creationDate);
+function isDatePassed(endDate: string): boolean {
+    const currentDate = new Date();
     const parsedEndDate = new Date(endDate);
-    return parsedEndDate < parsedCreationDate;
+    return parsedEndDate < currentDate;
 }
 
 export default function modificationIntervenant() {
@@ -28,8 +28,7 @@ export default function modificationIntervenant() {
     const [firstname, setFirstname] = useState("");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [creationdate, setCreationdate] = useState(null);
-    const [enddate, setEnddate] = useState(null);
+    const [enddate, setEnddate] = useState("");
     const [availability, setAvailability] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(true);
@@ -67,7 +66,6 @@ export default function modificationIntervenant() {
         setFirstname(result.firstname);
         setName(result.name);
         setEmail(result.email);
-        setCreationdate(result.creationdate);
         setEnddate(result.enddate);
         setAvailability(result.availability);
         setLoading(false);
@@ -106,7 +104,6 @@ export default function modificationIntervenant() {
 
     useEffect(() => {
         if (intervenant) {
-            setCreationdate(convertDateForInput(intervenant.creationdate));
             setEnddate(convertDateForInput(intervenant.enddate)); // Conversion de la date récupérée
         }
     }, [intervenant]);
@@ -177,7 +174,7 @@ export default function modificationIntervenant() {
                                 value={enddate}
                                 onChange={(e) => setEnddate(e.target.value)}
                                 required
-                                className={`p-2 border rounded-md focus:outline-none focus:ring-2 ${isDatePassed(creationdate, enddate) ? 'bg-orangeLight focus:ring-orange border-orange' : 'focus:ring-red border-gray-300'}`}
+                                className={`p-2 border rounded-md focus:outline-none focus:ring-2 ${isDatePassed(enddate) ? 'bg-orangeLight focus:ring-orange border-orange' : 'focus:ring-red border-gray-300'}`}
                             />
                         </div>
 
