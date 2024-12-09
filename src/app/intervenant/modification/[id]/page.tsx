@@ -106,6 +106,8 @@ export default function modificationIntervenant() {
         if (intervenant) {
             setEnddate(convertDateForInput(intervenant.enddate)); // Conversion de la date récupérée
         }
+        console.log(availability);
+        
     }, [intervenant]);
 
     if (loading) {
@@ -121,7 +123,7 @@ export default function modificationIntervenant() {
                             e.preventDefault();
                             handleModification();
                         }}
-                        className="max-w-xl p-6 m-auto bg-white rounded-lg shadow-md space-y-6 relative"
+                        className="max-w-xl p-6 m-auto bg-white rounded-lg shadow-md space-y-6 relative overflow-scroll"
                     >
                         <Link href="/dashboard" className='text-red hover:text-redHover'>
                             <CloseIcon className='absolute right-5 top-5 w-8 h-8' />
@@ -182,7 +184,7 @@ export default function modificationIntervenant() {
                             <label htmlFor="availability" className="font-semibold text-gray-700">Disponible</label>
                             <textarea
                                 id="availability"
-                                value={availability}
+                                value={JSON.stringify(availability, null, 4)}
                                 onChange={(e) => setAvailability(e.target.value)}
                                 className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red"
                                 required

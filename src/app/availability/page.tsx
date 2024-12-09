@@ -82,7 +82,9 @@ export default function AvailabilityPage() {
       const result = await response.json();
 
       if (response.ok) {
-        setIntervenant(result);        
+        setIntervenant(result);
+        console.log(result);
+        
       } else {
         throw new Error("La clé n'est pas valide");
       }
