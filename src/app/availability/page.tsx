@@ -8,9 +8,10 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import frLocale from '@fullcalendar/core/locales/fr';
+import generateDateForIntervenant from "./generateDateForIntervenant";
 
 function Calendar({ events, onEventDrop }: { events: any[]; onEventDrop: (event: any) => void }) {
-  
+
   return (
     <FullCalendar
       plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
@@ -20,9 +21,10 @@ function Calendar({ events, onEventDrop }: { events: any[]; onEventDrop: (event:
       headerToolbar={{
         left: 'prev,next today',
         center: 'title',
-        right: 'timeGridWeek',
+        right: '',
       }}
-      editable={true} // Permet de modifier les événements
+      nowIndicator={true}
+      editable={true}
       droppable={true} // Permet de déplacer des événements externes dans le calendrier
       events={events}
       eventDrop={(info) => {
@@ -51,6 +53,7 @@ export default function AvailabilityPage() {
   const key = searchParams.get('key');
   const router = useRouter();
 
+
   useEffect(() => {
     const verifyToken = async () => {
       try {
@@ -71,8 +74,19 @@ export default function AvailabilityPage() {
         setLoading(false);
       }
     };
-
     verifyToken();
+
+
+    const currentDate = new Date();
+
+    const getISOWeekNumber = (date) => {
+      const tempDate = new Date(date);
+      tempDate.setUTCDate(tempDate.getUTCDate() + 4 - (tempDate.getUTCDay() || 7)); // Ajuste pour ISO
+      const yearStart = new Date(Date.UTC(tempDate.getUTCFullYear(), 0, 1));
+      return Math.ceil(((tempDate - yearStart) / 86400000 + 1) / 7);
+    };
+
+    const weekNumber = getISOWeekNumber(currentDate);
   }, [router]);
 
   const fetchData = async () => {
@@ -83,8 +97,7 @@ export default function AvailabilityPage() {
 
       if (response.ok) {
         setIntervenant(result);
-        console.log(result);
-        
+
       } else {
         throw new Error("La clé n'est pas valide");
       }
@@ -93,7 +106,7 @@ export default function AvailabilityPage() {
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   const updateEventInState = (updatedEvent: any) => {
     // Mettez à jour l'événement dans l'état
@@ -101,6 +114,14 @@ export default function AvailabilityPage() {
       prevEvents.map((event) => (event.id === updatedEvent.id ? updatedEvent : event))
     );
   };
+
+  useEffect(() => {
+    if (intervenant) {
+      let disponibilities = intervenant.availability;
+      console.log(disponibilities);
+      setEvents(generateDateForIntervenant(disponibilities, "2024-01-09", "2025-12-13"));
+    }
+  }, [intervenant])
 
   if (!key) {
     return <p>Aucune clé renseignée dans l'URL</p>;
@@ -114,7 +135,11 @@ export default function AvailabilityPage() {
     return <p>Chargement...</p>;
   }
 
-  if (intervenant) {    
+  // if (isDatePassed(intervenant.enddate)) {
+  //   return <p>La clé de cet intervenant n'est plus valide !</p>
+  // }
+
+  if (intervenant) {
     return (
       <div>
         <h1>Page Availability</h1>
