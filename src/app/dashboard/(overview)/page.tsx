@@ -151,11 +151,11 @@ export default function Gestion() {
               <div className="truncate">{convertDateForInput(inter.enddate)}</div>
               {/* <div>{inter.availability}</div> */}
               <div className="absolute right-0 top-1/2 transform -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-              {/* {!isDatePassed(inter.enddate) && ( */}
-                <Link href={`/availability?key=${inter.key}`} className="bg-gray-50 p-2 rounded hover:bg-sky-100">
-                  <CalendarIcon className="w-4 h-4" />
-                </Link>
-              {/* )} */}
+                {!isDatePassed(inter.enddate) && (
+                  <Link href={`/availability?key=${inter.key}`} className="bg-gray-50 p-2 rounded hover:bg-sky-100">
+                    <CalendarIcon className="w-4 h-4" />
+                  </Link>
+                )}
                 <Link href={`/intervenant/modification/${inter.id}`} className="bg-gray-50 p-2 rounded hover:bg-sky-100">
                   <PenIcon className="w-4 h-4" />
                 </Link>

@@ -9,3 +9,7 @@
 
 # Date du 06/12/2024
 - Itérations 9, 10
+
+
+# Date du 13/12/2024
+- Itérations 11, *12(en cours...)*

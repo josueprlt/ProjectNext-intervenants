@@ -18,6 +18,12 @@ const getDateFromWeek = (year: number, week: number) => {
   return new Date(firstDayOfYear.setUTCDate(firstDayOfYear.getUTCDate() + daysOffset));
 };
 
+function isDatePassed(endDate: string): boolean {
+  const currentDate = new Date();
+  const parsedEndDate = new Date(endDate);
+  return parsedEndDate < currentDate;
+}
+
 function Calendar({ events, onEventDrop, selectedYear, selectedWeek }: {
   events: any[];
   onEventDrop: (event: any) => void;
@@ -157,9 +163,9 @@ export default function AvailabilityPage() {
     return <p>Chargement...</p>;
   }
 
-  // if (isDatePassed(intervenant.enddate)) {
-  //   return <p>La clé de cet intervenant n'est plus valide !</p>
-  // }
+  if (isDatePassed(intervenant.enddate)) {
+    return <p>La clé de cet intervenant n'est plus valide !</p>
+  }
 
   if (intervenant) {
     return (
