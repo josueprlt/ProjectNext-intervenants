@@ -10,6 +10,7 @@
   --color-red-light: #ffcfd2;
   --color-orange: #d8a648;
   --color-orange-light: #ffdd9e;
+  --color-orange-dark: #a98239;
 }
 
 @media (prefers-color-scheme: dark) {

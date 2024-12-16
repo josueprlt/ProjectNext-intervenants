@@ -10,6 +10,41 @@ export default function generateDateForIntervenant(data, startDate, endDate) {
         "samedi": 6
     };
 
+    // Fonction pour calculer dynamiquement les périodes de vacances
+    function getVacationPeriods(year) {
+        return [
+            {
+                start: new Date(`${year}-02-10`), // Vacances d'hiver (début février)
+                end: new Date(`${year}-02-25`)   // Fin février
+            },
+            {
+                start: new Date(`${year}-04-06`), // Vacances de printemps (début avril)
+                end: new Date(`${year}-04-21`)   // Fin avril
+            },
+            {
+                start: new Date(`${year}-07-06`), // Vacances d'été (début juillet)
+                end: new Date(`${year}-09-01`)   // Fin août
+            },
+            {
+                start: new Date(`${year}-10-19`), // Vacances de la Toussaint (fin octobre)
+                end: new Date(`${year}-11-04`)   // Début novembre
+            },
+            {
+                start: new Date(`${year}-12-21`), // Vacances de Noël (fin décembre)
+                end: new Date(`${year + 1}-01-06`) // Début janvier de l'année suivante
+            }
+        ];
+    }
+
+    // Vérifie si une date tombe dans une période de vacances
+    function isDateInVacation(date) {
+        const year = date.getFullYear();
+        const vacationPeriods = getVacationPeriods(year);
+        return vacationPeriods.some(vacation => {
+            return date >= vacation.start && date <= vacation.end;
+        });
+    }
+
     // Fonction pour ajouter des heures à une date
     function setTimeToDate(date, time) {
         const [hours, minutes] = time.split(':').map(Number);
@@ -30,6 +65,7 @@ export default function generateDateForIntervenant(data, startDate, endDate) {
     // Générer les événements pour une période donnée
     function processPeriod(periodData, periodStart, periodEnd) {
         for (let d = new Date(periodStart); d <= periodEnd; d.setDate(d.getDate() + 1)) {
+            if (isDateInVacation(d)) continue; // Ignorer les dates en vacances
             const dayIndex = d.getDay();
             const dayName = Object.keys(daysMap).find(key => daysMap[key] === dayIndex);
 
