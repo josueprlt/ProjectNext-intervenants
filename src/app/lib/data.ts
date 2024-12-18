@@ -197,3 +197,20 @@ export async function getIntervenantByKey(key: string) {
         client.release();
     }
 }
+
+
+export async function saveAvailability(data: any) {
+    const client = await db.connect();
+    try {
+        const result = await client.query(
+            'UPDATE intervenants SET availability = $2 WHERE email = $1 RETURNING *',
+            [data.email, JSON.stringify(data.events)]
+        );
+        return result.rows[0];
+    } catch (err) {
+        console.error('Erreur lors de la sauvegarde', err);
+        throw err;
+    } finally {
+        client.release();
+    }
+}

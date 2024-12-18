@@ -8,7 +8,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
 import frLocale from '@fullcalendar/core/locales/fr';
-import generateDateForIntervenant from "./generateDateForIntervenant";
+import generateDateForIntervenant, {formatEvents} from "./generateDateForIntervenant";
 import NumberWeek from "@/app/ui/numberweek";
 
 const getDateFromWeek = (year: number, week: number) => {
@@ -30,12 +30,36 @@ function isDatePassed(endDate: string): boolean {
   return parsedEndDate < currentDate;
 }
 
-function Calendar({ events, setEvents, onEventDrop, selectedYear, selectedWeek }: {
+async function saveCalendarEvents(events, email) {
+  try {
+    const formattedEvents = formatEvents(events);
+    console.log(formattedEvents);
+    const response = await fetch('/api/saveCalendar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ events, email })
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Événements sauvegardés avec succès:', result);
+    } else {
+      console.error('Échec de la sauvegarde des événements:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde des événements:', error);
+  }
+}
+
+function Calendar({ events, setEvents, onEventDrop, selectedYear, selectedWeek, intervenant }: {
   events: any[];
   setEvents: any;
   onEventDrop: (event: any) => void;
   selectedYear: number;
   selectedWeek: number;
+  intervenant: any;
 }) {
   let notDoublon = 0;
   const calendarRef = useRef<any>(null);
@@ -65,26 +89,13 @@ function Calendar({ events, setEvents, onEventDrop, selectedYear, selectedWeek }
     <div className="col-start-2 col-end-5 w-full h-full">
       <div
         id="external-events"
-        className="p-4 border border-gray-300 bg-gray-100 w-48 mr-4"
+        className="bg-gray-200 p-3 rounded-md w-full mb-2"
       >
-        <p className="font-bold">Blocs de date</p>
         <div
-          className="fc-event mb-2 p-2 bg-blue-500 text-white cursor-move"
-          data-event='{"title":"Rendez-vous", "duration":"01:00"}'
+          className="fc-event p-2 w-max bg-redHover cursor-move text-white rounded-md"
+          data-event='{"title":"Disponibilité", "duration":"00:30"}'
         >
-          Rendez-vous
-        </div>
-        <div
-          className="fc-event mb-2 p-2 bg-green-500 text-white cursor-move"
-          data-event='{"title":"Réunion", "duration":"02:00"}'
-        >
-          Réunion
-        </div>
-        <div
-          className="fc-event mb-2 p-2 bg-yellow-500 text-black cursor-move"
-          data-event='{"title":"Pause", "duration":"00:30"}'
-        >
-          Pause
+          Ajouter une nouvelle date
         </div>
       </div>
 
@@ -113,6 +124,7 @@ function Calendar({ events, setEvents, onEventDrop, selectedYear, selectedWeek }
             id: Date.now().toString(), // Génère un ID unique
             title: info.event.title,
             start: info.event.start.toISOString(),
+            end: info.event.end.toISOString(),
             week: selectedWeek,
             year: selectedYear,
           };
@@ -123,6 +135,8 @@ function Calendar({ events, setEvents, onEventDrop, selectedYear, selectedWeek }
             console.log("Nouvel événement ajouté :", newEvent);
             notDoublon++;
           }
+
+          saveCalendarEvents(events, intervenant.email);
 
         }}
         eventDrop={(info) => {
@@ -140,6 +154,8 @@ function Calendar({ events, setEvents, onEventDrop, selectedYear, selectedWeek }
           );
 
           console.log("Événement déplacé :", updatedEvent);
+
+          saveCalendarEvents(events, intervenant.email);
         }}
         eventColor="#d84851"
       />
@@ -157,9 +173,6 @@ export default function AvailabilityPage() {
   const searchParams = useSearchParams();
   const key = searchParams.get('key');
   const router = useRouter();
-
-  console.log(events);
-  
 
   const checkWeekHasEvents = (weekNumber: number) => {
     // Vérifiez si des événements sont présents pour la semaine donnée
@@ -226,9 +239,9 @@ export default function AvailabilityPage() {
       let disponibilities = intervenant.availability;
 
       let previousYearDate = new Date(currentDate);
-      previousYearDate.setFullYear(currentDate.getFullYear() - 2);
+      previousYearDate.setFullYear(currentDate.getFullYear() - 1);
       let nextYearDate = new Date(currentDate);
-      nextYearDate.setFullYear(currentDate.getFullYear() + 2);
+      nextYearDate.setFullYear(currentDate.getFullYear() + 1);
 
       setEvents(generateDateForIntervenant(disponibilities, previousYearDate, nextYearDate));
     }
@@ -269,6 +282,7 @@ export default function AvailabilityPage() {
             onEventDrop={updateEventInState}
             selectedYear={selectedYear}
             selectedWeek={selectedWeek}
+            intervenant={intervenant}
           />
         </section>
       </div>

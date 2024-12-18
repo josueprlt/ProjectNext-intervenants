@@ -1,3 +1,6 @@
+import { parseISO, format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+
 export default function generateDateForIntervenant(data, startDate, endDate) {
     const fullCalendarEvents = [];
     const daysMap = {
@@ -116,4 +119,67 @@ export default function generateDateForIntervenant(data, startDate, endDate) {
     });
 
     return fullCalendarEvents;
+}
+
+
+
+export function formatEvents(events) {
+    const formattedEvents = {};
+
+    events.forEach(event => {
+        const start = parseISO(event.start);
+        const end = parseISO(event.end);
+        const dayName = format(start, 'EEEE', { locale: fr }).toLowerCase();
+        const weekNumber = `S${format(start, 'w')}`;
+
+        const eventData = {
+            days: dayName,
+            from: format(start, 'HH:mm'),
+            to: format(end, 'HH:mm')
+        };
+
+        if (!formattedEvents[weekNumber]) {
+            formattedEvents[weekNumber] = [];
+        }
+
+        // Check if the same day already exists in the week
+        const existingEvent = formattedEvents[weekNumber].find(e => e.days === dayName);
+        if (existingEvent) {
+            // Merge time ranges if they overlap or are adjacent
+            const existingStart = parseISO(`${format(start, 'yyyy-MM-dd')}T${existingEvent.from}`);
+            const existingEnd = parseISO(`${format(start, 'yyyy-MM-dd')}T${existingEvent.to}`);
+
+            if (start <= existingEnd && end >= existingStart) {
+                existingEvent.from = format(Math.min(existingStart, start), 'HH:mm');
+                existingEvent.to = format(Math.max(existingEnd, end), 'HH:mm');
+            } else {
+                formattedEvents[weekNumber].push(eventData);
+            }
+        } else {
+            formattedEvents[weekNumber].push(eventData);
+        }
+    });
+
+    // Combine days with the same time ranges
+    for (const week in formattedEvents) {
+        const combinedEvents = {};
+        formattedEvents[week].forEach(event => {
+            const timeRange = `${event.from}-${event.to}`;
+            if (!combinedEvents[timeRange]) {
+                combinedEvents[timeRange] = [];
+            }
+            combinedEvents[timeRange].push(event.days);
+        });
+
+        formattedEvents[week] = Object.entries(combinedEvents).map(([timeRange, days]) => {
+            const [from, to] = timeRange.split('-');
+            return {
+                days: days.join(', '),
+                from,
+                to
+            };
+        });
+    }
+
+    return formattedEvents;
 }
