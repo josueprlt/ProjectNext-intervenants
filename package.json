@@ -9,10 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "15.0.3",
+    "@fullcalendar/react": "^6.1.15",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
+    "fullcalendar": "^6.1.15",
+    "jsonwebtoken": "^9.0.2",
+    "luxon": "^3.5.0",
+    "next": "^15.0.3",
+    "next-auth": "^5.0.0-beta.25",
     "nodemon": "^3.1.7",
-    "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106"
+    "pg": "^8.13.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.0.1",
+    "uuid": "^11.0.3",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -23,5 +34,13 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "browser": {
+    "fs": false,
+    "dns": false,
+    "net": false,
+    "tls": false,
+    "os": false,
+    "path": false
   }
 }
