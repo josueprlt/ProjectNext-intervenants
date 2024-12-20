@@ -1,3 +1,4 @@
+import { JsonObject } from 'next-auth/adapters';
 import db from './db';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -31,7 +32,7 @@ export async function getIntervenantById(id: number) {
     }
 }
 
-export async function addIntervenant(data: { firstname: string; name: string; email: string; creationdate: Date; enddate: Date; key: string; availability: boolean }) {
+export async function addIntervenant(data: { firstname: string; name: string; email: string; creationdate: Date; enddate: Date; key: string; availability: string }) {
     const client = await db.connect();
     try {
         const result = await client.query(

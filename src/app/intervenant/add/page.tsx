@@ -136,7 +136,6 @@ export default function AddIntervenant() {
                             value={availability}
                             onChange={(e) => setAvailability(e.target.value)}
                             placeholder='Insérez disponibilité'
-                            required
                             className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red"
                         />
                     </div>

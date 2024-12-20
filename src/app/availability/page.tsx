@@ -1,108 +1,37 @@
-'use client';
+"use client"
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
+import transformScheduleToEvents from './transformScheduleToEvents';
+import formatEvents from './transformEventsToSchedule';
 import frLocale from '@fullcalendar/core/locales/fr';
-import transformScheduleToEvents from "./transformScheduleToEvents";
-// import formatEvents from "./transformEventsToSchedule";
 import NumberWeek from "@/app/ui/numberweek";
 
-const getDateFromWeek = (year: number, week: number) => {
-  const firstDayOfYear = new Date(Date.UTC(year, 0, 1));
-  const daysOffset = (week - 1) * 7;
-  return new Date(firstDayOfYear.setUTCDate(firstDayOfYear.getUTCDate() + daysOffset));
-};
-
-const getISOWeekNumber = (date: Date) => {
-  const tempDate = new Date(date);
-  tempDate.setUTCDate(tempDate.getUTCDate() + 4 - (tempDate.getUTCDay() || 7));
-  const yearStart = new Date(Date.UTC(tempDate.getUTCFullYear(), 0, 1));
-  return Math.ceil(((tempDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-};
-
-function isDatePassed(endDate: string): boolean {
-  const currentDate = new Date();
-  const parsedEndDate = new Date(endDate);
-  return parsedEndDate < currentDate;
+function getISOWeekNumber(date: Date) {
+  const tempDate = new Date(date.getTime());
+  tempDate.setHours(0, 0, 0, 0);
+  tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
+  const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+  const weekNo = Math.ceil((((tempDate.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  return weekNo;
 }
 
-async function saveCalendarEvents(events: any[], email: string) {
-  try {
-    // Si l'événement est un seul objet, le convertir en tableau
-    if (!Array.isArray(events)) {
-      events = [events];
-    }
-
-    const eventsByWeek: Record<string, any[]> = {};
-
-    events.forEach((event) => {
-      console.log(event);
-      
-      const weekNumber = event.weekNumber ? `S${event.weekNumber}` : 'default';
-      const newEvent = {
-        days: event.days || 'lundi, mardi, mercredi, jeudi, vendredi',
-        from: event.from || '8:00',
-        to: event.to || '18:30',
-      };
-
-      // Initialisation de la semaine si elle n'existe pas
-      if (!eventsByWeek[weekNumber]) {
-        eventsByWeek[weekNumber] = [];
-      }
-
-      // Recherche d'une plage horaire identique
-      const existingRange = eventsByWeek[weekNumber].find(
-        (e) => e.from === newEvent.from && e.to === newEvent.to
-      );
-
-      if (existingRange) {
-        // Si une plage horaire identique existe, on regroupe les jours
-        existingRange.days = [
-          ...new Set([...existingRange.days.split(', '), ...newEvent.days.split(', ')]),
-        ].join(', ');
-      } else {
-        // Sinon, on ajoute un nouvel événement
-        eventsByWeek[weekNumber].push(newEvent);
-      }
-    });
-
-    // Étape 2 : Ajouter la section "default" si elle n'existe pas
-    if (!eventsByWeek.default) {
-      eventsByWeek.default = [
-        {
-          days: 'lundi, mardi, mercredi, jeudi, vendredi',
-          from: '8:00',
-          to: '18:30',
-        },
-      ];
-    }
-
-    // Étape 3 : Sauvegarder dans la base de données
-    const response = await fetch('/api/saveCalendar', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ events: eventsByWeek, email }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Échec de la sauvegarde');
-    }
-
-    const result = await response.json();
-    console.log('Événements sauvegardés avec succès:', result);
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde des événements:', error);
+function getDateFromWeek(year: number, week: number) {
+  const simple = new Date(year, 0, 1 + (week - 1) * 7);
+  const dow = simple.getDay();
+  const ISOweekStart = simple;
+  if (dow <= 4) {
+    ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+  } else {
+    ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
   }
+  return ISOweekStart;
 }
-
-
 
 function Calendar({ events, setEvents, selectedYear, selectedWeek, intervenant }: {
   events: any[];
@@ -134,6 +63,98 @@ function Calendar({ events, setEvents, selectedYear, selectedWeek, intervenant }
     }
   }, []);
 
+  const saveCalendarEvents = async (updatedEvents: any[]) => {
+    const formattedEvents = formatEvents(updatedEvents);
+    console.log('Saving events:', formattedEvents);
+    try {
+      const response = await fetch('/api/saveCalendar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: intervenant.email, events: formattedEvents }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Failed to save events:', errorText);
+        throw new Error('Failed to save events');
+      }
+
+      const result = await response.json();
+      console.log('Events saved successfully:', result);
+    } catch (error) {
+      console.error('Error saving events:', error);
+    }
+  };
+
+  const handleEventAdd = (info: any) => {
+    if (!info.event.start || !info.event.end) {
+      console.error('Invalid event date:', info.event);
+      return;
+    }
+
+    const newEvent = {
+      title: info.event.title,
+      start: info.event.start.toISOString(),
+      end: info.event.end.toISOString(),
+      weekNumber: selectedWeek,
+      days: info.event.start.toLocaleDateString('fr-FR', { weekday: 'long' }),
+    };
+
+    const updatedEvents = [...events, newEvent];
+    setEvents(updatedEvents);
+    saveCalendarEvents(updatedEvents);
+  };
+
+  const handleEventChange = (info: any) => {
+    if (!info.event.start || !info.event.end) {
+      console.error('Invalid event date:', info.event);
+      return;
+    }
+
+    const updatedEvent = {
+      title: info.event.title,
+      start: info.event.start.toISOString(),
+      end: info.event.end?.toISOString() || null,
+      weekNumber: selectedWeek,
+      days: info.event.start.toLocaleDateString('fr-FR', { weekday: 'long' }),
+    };
+
+    const updatedEvents = events.map(event =>
+      event.id === info.event.id ? updatedEvent : event
+    );
+    setEvents(updatedEvents);
+    saveCalendarEvents(updatedEvents);
+  };
+
+  const handleEventRemove = (info: any) => {
+    const updatedEvents = events.filter(event => event.id !== info.event.id);
+    setEvents(updatedEvents);
+    saveCalendarEvents(updatedEvents);
+  };
+
+  const handleEventResize = (info: any) => {
+    if (!info.event.start || !info.event.end) {
+      console.error('Invalid event date:', info.event);
+      return;
+    }
+
+    const updatedEvent = {
+      title: info.event.title,
+      start: info.event.start.toISOString(),
+      end: info.event.end?.toISOString() || null,
+      weekNumber: selectedWeek,
+      days: info.event.start.toLocaleDateString('fr-FR', { weekday: 'long' }),
+    };
+
+    const updatedEvents = events.map(event =>
+      event.id === info.event.id ? updatedEvent : event
+    );
+    setEvents(updatedEvents);
+    saveCalendarEvents(updatedEvents);
+  };
+
   return (
     <div className="col-start-2 col-end-5 w-full h-full">
       <div
@@ -164,39 +185,12 @@ function Calendar({ events, setEvents, selectedYear, selectedWeek, intervenant }
         editable={true}
         droppable={true} // Permet de drop des événements externes
         events={events}
-        eventReceive={(info) => {
-          // Empêche FullCalendar d'ajouter l'événement automatiquement
-          info.event.remove();
-
-
-          const newEvent = {
-            title: info.event.title,
-            start: info.event.start.toISOString(),
-            end: info.event.end.toISOString(),
-            weekNumber: selectedWeek, // Ajouter la semaine
-            days: info.event.start.toLocaleDateString('fr-FR', { weekday: 'long' }), // Extraire le jour de la semaine
-          };
-
-          // Sauvegarde après ajout de l'événement
-          saveCalendarEvents([newEvent], intervenant.email, selectedWeek); // Assurez-vous de passer un tableau
-        }}
-        eventDrop={(info) => {
-          const updatedEvent = {
-            title: info.event.title,
-            start: info.event.start.toISOString(),
-            end: info.event.end?.toISOString() || null,
-            weekNumber: selectedWeek, // Ajouter la semaine
-            days: info.event.start.toLocaleDateString('fr-FR', { weekday: 'long' }), // Extraire le jour de la semaine
-          };
-
-          console.log("Événement déplacé :", updatedEvent);
-
-          // Sauvegarde après déplacement de l'événement
-          saveCalendarEvents(events, intervenant.email);
-        }}
+        eventReceive={handleEventAdd}
+        eventDrop={handleEventChange}
+        eventRemove={handleEventRemove}
+        eventResize={handleEventResize} // Ajout du gestionnaire pour l'événement eventResize
         eventColor="#d84851"
       />
-
     </div>
   );
 }
@@ -213,12 +207,36 @@ export default function AvailabilityPage() {
   const router = useRouter();
 
   const checkWeekHasEvents = (weekNumber: number) => {
-    // Vérifiez si des événements sont présents pour la semaine donnée
     return events.some((event) => {
       const eventDate = new Date(event.start);
       const eventWeek = getISOWeekNumber(eventDate);
       return eventWeek === weekNumber && eventDate.getFullYear() === selectedYear;
     });
+  };
+
+  const saveCalendarEvents = async (updatedEvents: any[]) => {
+    const formattedEvents = formatEvents(updatedEvents);
+    console.log('Saving events:', formattedEvents);
+    try {
+      const response = await fetch('/api/saveEvents', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: intervenant.email, events: formattedEvents }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Failed to save events:', errorText);
+        throw new Error('Failed to save events');
+      }
+
+      const result = await response.json();
+      console.log('Events saved successfully:', result);
+    } catch (error) {
+      console.error('Error saving events:', error);
+    }
   };
 
   useEffect(() => {
@@ -270,38 +288,33 @@ export default function AvailabilityPage() {
     return <p>Aucune clé renseignée dans l'URL</p>;
   }
 
-  if (error) {
-    return <p>{error}</p>;
-  }
-
-  if (loading) {
-    return <p>Chargement...</p>;
-  }
-
-  if (isDatePassed(intervenant.enddate)) {
-    return <p>La clé de cet intervenant n'est plus valide !</p>;
-  }
-
   return (
-    <div className="h-screen mx-4">
-      <h1>Page Availability</h1>
-      <p>Bonjour, {intervenant.firstname} {intervenant.name} !</p>
-      <section className="flex flex-col md:grid md:grid-cols-4 gap-4 w-full mt-10">
-        <NumberWeek
-          activeWeek={selectedWeek}
-          onWeekClick={(week) => setSelectedWeek(week)}
-          activeYear={selectedYear}
-          onYearChange={(year) => setSelectedYear(year)}
-          weekHasEvents={checkWeekHasEvents}
-        />
-        <Calendar
-          events={events}
-          setEvents={setEvents}
-          selectedYear={selectedYear}
-          selectedWeek={selectedWeek}
-          intervenant={intervenant}
-        />
-      </section>
+
+    <div>
+      {loading && <p>Chargement...</p>}
+      {error && <p>{error}</p>}
+      {!loading && !error && (
+        <div className="h-screen mx-4">
+          <h1>Page Availability</h1>
+          <p>Bonjour, {intervenant.firstname} {intervenant.name} !</p>
+          <section className="flex flex-col md:grid md:grid-cols-4 gap-4 w-full mt-10">
+            <NumberWeek
+              activeWeek={selectedWeek}
+              onWeekClick={(week) => setSelectedWeek(week)}
+              activeYear={selectedYear}
+              onYearChange={(year) => setSelectedYear(year)}
+              weekHasEvents={checkWeekHasEvents}
+            />
+            <Calendar
+              events={events}
+              setEvents={setEvents}
+              selectedYear={selectedYear}
+              selectedWeek={selectedWeek}
+              intervenant={intervenant}
+            />
+          </section>
+        </div>
+      )}
     </div>
   );
 }
