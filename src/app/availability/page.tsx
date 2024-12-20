@@ -214,31 +214,6 @@ export default function AvailabilityPage() {
     });
   };
 
-  const saveCalendarEvents = async (updatedEvents: any[]) => {
-    const formattedEvents = formatEvents(updatedEvents);
-    console.log('Saving events:', formattedEvents);
-    try {
-      const response = await fetch('/api/saveEvents', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: intervenant.email, events: formattedEvents }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Failed to save events:', errorText);
-        throw new Error('Failed to save events');
-      }
-
-      const result = await response.json();
-      console.log('Events saved successfully:', result);
-    } catch (error) {
-      console.error('Error saving events:', error);
-    }
-  };
-
   useEffect(() => {
     const verifyToken = async () => {
       try {
